@@ -1,25 +1,21 @@
 [
   {
     "text": "Add Task",
-    "href": "#settings",
     "id": "nav-add",
     "icon": "../images/add.svg"
   },
   {
     "text": "Tasks",
-    "href": "#tasks",
     "id": "nav-tasks",
     "icon": "../images/tasks.svg",
     "subCategories": [
       {
         "text": "Study Odin Project",
-        "href": "#tasks-study",
         "id": "nav-tasks-study",
         "description": "Focus on completing the JavaScript modules and building the final project."
       },
       {
         "text": "Daily Errands",
-        "href": "#tasks-errands",
         "id": "nav-tasks-errands",
         "description": "Grocery shopping, post office visit, and dry cleaning pickup."
       }

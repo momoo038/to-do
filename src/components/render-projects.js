@@ -42,17 +42,11 @@ export default function renderProjectCards(container, projectItems) {
 
     card.addEventListener("click", function (event) {
       const removeIconInstance = this.querySelector(".trash-can-icon");
-
       if (
         removeIconInstance &&
         (event.target === removeIconInstance ||
           removeIconInstance.contains(event.target))
       ) {
-        console.log(
-          "Remove icon clicked for card:",
-          itemData.text,
-          "- Card will be removed."
-        );
         this.remove();
         return;
       }
