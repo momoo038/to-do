@@ -1,10 +1,5 @@
 [
   {
-    "text": "Add Task",
-    "id": "nav-add",
-    "icon": "../images/add.svg"
-  },
-  {
     "text": "Tasks",
     "id": "nav-tasks",
     "icon": "../images/tasks.svg",

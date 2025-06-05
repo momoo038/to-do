@@ -159,29 +159,42 @@ body {
   display: block;
 }
 
-#nav-add {
+.nav-add-btn {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
-  color: #333;
+  top: 25px;
+  right: 50px;
+  background-color: #0599d3;
+  color: #eeeeee;
   border: none;
-  border-radius: 50%;
-  width: auto;
-  height: 50px;
+  border-radius: 15px;
   font-size: 24px;
   display: flex;
+  padding: 7px 10px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 
-#nav-add:after {
-  content: "";
-  position: absolute;
-  bottom: 65px;
-  left: 0;
-  width: 210px;
-  height: 2px;
-  background-color: #d7d7d7;
-  margin-top: 10px;
+.nav-add-text {
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.no-tasks-message {
+  font-size: 1.1em;
+  padding: 20px;
+  margin-left: 250px;
+}
+
+.no-project-subtitle {
+  font-size: 1.2em;
+  color: #666;
+  padding: 0 20px;
+  margin-left: 250px;
 }

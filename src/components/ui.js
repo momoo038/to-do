@@ -3,11 +3,32 @@ import renderNavLinks from "../components/render-nav.js";
 import renderProjectCards from "../components/render-projects.js";
 import "/src/styles/ui-styles.css";
 import checkmarkLogo from "../images/checkmark.png";
-import navItemsFromJson from "../data/navigation.json";
+import initialNavigationDataFromFile from "../data/navigation.json";
+import {
+  loadDataFromLocalStorage,
+  saveDataToLocalStorage,
+} from "../utils/localStorageUtils.js";
+import addIcon from "../images/add.svg";
+
+let navItemsFromJson;
+let navFunctionsContainer;
 
 export default function renderUI() {
-  const content = document.querySelector("#content");
+  navItemsFromJson = loadDataFromLocalStorage();
+  if (!navItemsFromJson) {
+    navItemsFromJson = JSON.parse(
+      JSON.stringify(initialNavigationDataFromFile)
+    );
+    saveDataToLocalStorage(navItemsFromJson);
+  }
 
+  const content = document.querySelector("#content");
+  if (content) {
+    content.innerHTML = "";
+  } else {
+    console.error("#content not found")
+    return;
+  }
   const mainContainer = domUtils.createElement("div", { classes: "ui-main" });
   content.appendChild(mainContainer);
 
@@ -25,9 +46,18 @@ export default function renderUI() {
     ],
   });
 
-  const navFunctionsContainer = domUtils.createElement("div", {
+  navFunctionsContainer = domUtils.createElement("div", {
     classes: "nav-functions",
   });
+
+  function refreshNav() {
+    if (navFunctionsContainer && navItemsFromJson) {
+      renderNavLinks(navFunctionsContainer, navItemsFromJson);
+      console.log("Nav refreshed")
+    } else {
+      console.error("Can't refresh nav")
+    }
+  }
 
   if (navItemsFromJson) {
     renderNavLinks(navFunctionsContainer, navItemsFromJson);
@@ -44,8 +74,23 @@ export default function renderUI() {
     classes: "side-nav",
     children: [logoTitle, navFunctionsContainer],
   });
-
   mainContainer.appendChild(sideNav);
+
+  const addTask = domUtils.createElement("div", {
+    classes: "nav-add-btn",
+    children: [
+      domUtils.createImage(addIcon, {
+        classes: "nav-add-icon",
+        height: "50px",
+        width: "50px"
+      }),
+      domUtils.createElement("span", {
+        classes: "nav-add-text",
+        textContent: "Add Task",
+      }),
+    ],
+  });
+  sideNav.appendChild(addTask);
 
   const projectContainer = domUtils.createElement("div", {
     classes: "projects-main",
@@ -71,12 +116,27 @@ export default function renderUI() {
       tasksItem.subCategories &&
       tasksItem.subCategories.length > 0
     ) {
-      renderProjectCards(projectDisplayContainer, tasksItem.subCategories);
+      const subTasksTitle = domUtils.createElement("h2", {
+        classes: "project-subtitle",
+        textContent: `Sub-tasks for: ${tasksItem.text}`,
+      });
+      projectDisplayContainer.appendChild(subTasksTitle);
+      renderProjectCards(
+        projectDisplayContainer,
+        tasksItem.subCategories,
+        navItemsFromJson,
+        refreshNav
+      );
     } else {
-      projectsPageTitle.textContent = "No Task Sub-categories";
+      projectDisplayContainer.innerHTML = "";
+      const noSubTasksTitle = domUtils.createElement("h2", {
+        classes: "no-project-subtitle",
+      });
+      projectDisplayContainer.appendChild(noSubTasksTitle);
+
       const messageElement = domUtils.createElement("p", {
-        textContent:
-          "The 'Tasks' category was not found or has no sub-categories to display.",
+        textContent: "There are no tasks at the moment. Add new!",
+        classes: "no-tasks-message",
       });
       projectDisplayContainer.appendChild(messageElement);
       console.warn(
@@ -84,7 +144,12 @@ export default function renderUI() {
       );
     }
   } else {
-    projectsPageTitle.textContent = "Error";
+    projectDisplayContainer.innerHTML = "";
+    const errorTitle = domUtils.createElement("h2", {
+      classes: "project-subtitle",
+      textContent: "Error",
+    });
+    projectDisplayContainer.appendChild(errorTitle);
     const errorMessage = domUtils.createElement("p", {
       textContent: "Navigation data not loaded.",
     });
