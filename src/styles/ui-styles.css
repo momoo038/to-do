@@ -73,14 +73,22 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 2.5px;
+}
+
+.nav-link#nav-tasks {
+  border: none;
+  padding-bottom: 0;
+  margin: 0;
+  margin-top: 15px;
 }
 
 .sub-nav-links {
   display: flex;
   flex-direction: column;
-  padding-left: 25px;
   gap: 10px;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .projects-main {
@@ -101,6 +109,7 @@ body {
   flex-wrap: wrap;
   padding: 10px 0;
   margin-left: 250px;
+  align-items: flex-start;
 }
 
 .project-card {
@@ -117,7 +126,14 @@ body {
   text-align: center;
   font-size: 15px;
   position: relative;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
+
+.project-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(196, 196, 196, 0.5);
+}
+
 
 .project-card.clickable {
   cursor: pointer;
@@ -138,10 +154,6 @@ body {
   font-size: 14px;
   color: #666;
   margin-bottom: 15px;
-}
-
-.project-card.card-is-selected {
-  border-color: #28a745;
 }
 
 .trash-can-icon {
@@ -197,4 +209,84 @@ body {
   color: #666;
   padding: 0 20px;
   margin-left: 250px;
+}
+
+.task-priority.priority-5 {
+  color: red;
+  font-weight: bold;
+}
+.task-priority.priority-4 {
+  color: orange;
+}
+
+.task-details span {
+  margin-right: 15px;
+  font-size: 0.9em;
+  color: #555;
+}
+
+.project-card-task-entry + .project-card-task-entry {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 10px; 
+  padding-top: 10px;           
+}
+
+.task-completed .task-text {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.task-main-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.task-main-info .task-text {
+  margin-left: 8px;
+}
+
+.project-card.project-completed {
+  border: 2px solid #28a745;
+}
+
+.task-item-description {
+  font-size: 0.9em;
+  color: #6c757d;   
+  margin-top: 2px;       
+  margin-bottom: 8px;     
+  font-style: italic; 
+  padding-right: 10px;
+}
+
+.project-subtitle {
+  visibility: hidden;
+}
+
+.nav-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 15px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.nav-task-item {
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.nav-task-item.completed {
+  color: #888;
+  text-decoration: line-through;
+}
+
+.no-tasks-nav-message {
+  font-size: 16px;
+  color: #777;
+  font-style: italic;
+  padding: 10px 0;
 }

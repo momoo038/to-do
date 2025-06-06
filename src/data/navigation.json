@@ -1,18 +1,41 @@
 [
   {
-    "text": "Tasks",
+    "text": "Projects",
     "id": "nav-tasks",
     "icon": "../images/tasks.svg",
-    "subCategories": [
+    "projects": [
       {
-        "text": "Study Odin Project",
+        "text": "Odin Project",
         "id": "nav-tasks-study",
-        "description": "Focus on completing the JavaScript modules and building the final project."
+        "tasks": [
+          {
+            "text": "Finish to-do",
+            "description": "Do this and that to finish the task",
+            "dueDate": "2025-06-15",
+            "Priority": "5",
+            "isCompleted": false
+          },
+          {
+            "text": "Finish to-do",
+            "description": "Do this and that to finish the task",
+            "dueDate": "2025-06-15",
+            "Priority": "4",
+            "isCompleted": false
+          }
+        ]
       },
       {
         "text": "Daily Errands",
         "id": "nav-tasks-errands",
-        "description": "Grocery shopping, post office visit, and dry cleaning pickup."
+        "tasks": [
+          {
+            "text": "Go shopping",
+            "description": "Do this and that to buy groceries",
+            "dueDate": "2025-06-15",
+            "Priority": "2",
+            "isCompleted": false
+          }
+        ]
       }
     ]
   }

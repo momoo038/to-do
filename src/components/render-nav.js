@@ -1,63 +1,68 @@
-import { domUtils } from "../utils/domUtils";
+import { domUtils } from "../utils/domUtils.js";
 
 export default function renderNavLinks(nav, items) {
-    if (!nav) return;
-    nav.innerHTML = "";
+  if (!nav) return;
+  nav.innerHTML = "";
 
-    items.forEach(itemData => {
-        const linkChildren = [];
-
-        if (itemData.icon) {
-            const iconImageElement = domUtils.createImage(itemData.icon, "", {
-                classes: "nav-icon" 
-            });
-
-            if (iconImageElement) { 
-                linkChildren.push(iconImageElement);
-                linkChildren.push(document.createTextNode(" "));
-            }
-        }
-
-        linkChildren.push(document.createTextNode(itemData.text || ""));
-
-        const link = domUtils.createElement("a", {
-            classes: "nav-link",
-            href: itemData.href,
-            id: itemData.id,
-            children: linkChildren
-        });
-        nav.appendChild(link);
-
-        if (itemData.subCategories && itemData.subCategories.length > 0) {
-            const subNavContainer = domUtils.createElement("div", {
-                classes: "sub-nav-links"
-            });
-
-            itemData.subCategories.forEach(subItemData => {
-                const subLinkChildren = [];
-
-                if (subItemData.icon) {
-                    const subIconImageElement = domUtils.createImage(subItemData.icon, "", {
-                        classes: ["nav-icon", "sub-nav-icon"]
-                    });
-
-                    if (subIconImageElement) {
-                        subLinkChildren.push(subIconImageElement);
-                        subLinkChildren.push(document.createTextNode(" "));
-                    }
-                }
-
-                subLinkChildren.push(document.createTextNode(subItemData.text || ""));
-
-                const subLink = domUtils.createElement("a", {
-                    classes: ["nav-link", "sub-nav-link"],
-                    href: subItemData.href,
-                    id: subItemData.id,
-                    children: subLinkChildren
-                });
-                subNavContainer.appendChild(subLink);
-            });
-            nav.appendChild(subNavContainer);
-        }
+  items.forEach((itemData) => {
+    const linkChildren = [];
+    if (itemData.icon) {
+      const iconImageElement = domUtils.createImage(itemData.icon, "", {
+        classes: "nav-icon",
+      });
+      if (iconImageElement) {
+        linkChildren.push(iconImageElement);
+      }
+    }
+    linkChildren.push(document.createTextNode(itemData.text || ""));
+    const link = domUtils.createElement("a", {
+      classes: "nav-link",
+      id: itemData.id,
+      children: linkChildren,
     });
+    nav.appendChild(link);
+
+    if (itemData.projects) {
+      const subNavContainer = domUtils.createElement("div", {
+        classes: "sub-nav-links",
+      });
+
+      if (itemData.projects.length > 0) {
+        itemData.projects.forEach((projectData) => {
+          const projectLink = domUtils.createElement("a", {
+            classes: ["nav-link", "sub-nav-link"],
+            id: projectData.id,
+            textContent: projectData.text,
+          });
+          subNavContainer.appendChild(projectLink);
+
+          if (projectData.tasks && projectData.tasks.length > 0) {
+            const tasksListContainer = domUtils.createElement("div", {
+              classes: "nav-tasks-list",
+            });
+            projectData.tasks.forEach((taskData) => {
+              const statusIcon = taskData.isCompleted ? "●" : "○";
+
+              const taskElement = domUtils.createElement("span", {
+                classes: "nav-task-item",
+                textContent: `${statusIcon} ${taskData.text}`,
+              });
+              if (taskData.isCompleted) {
+                taskElement.classList.add("completed");
+              }
+              tasksListContainer.appendChild(taskElement);
+            });
+            subNavContainer.appendChild(tasksListContainer);
+          }
+        });
+      } else {
+        const noTasksMessage = domUtils.createElement("span", {
+          classes: "no-tasks-nav-message",
+          textContent: "Peace and silence; nothing to display.",
+        });
+        subNavContainer.appendChild(noTasksMessage);
+      }
+      nav.appendChild(subNavContainer);
+    }
+  });
 }

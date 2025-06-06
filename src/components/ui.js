@@ -26,7 +26,7 @@ export default function renderUI() {
   if (content) {
     content.innerHTML = "";
   } else {
-    console.error("#content not found")
+    console.error("#content not found");
     return;
   }
   const mainContainer = domUtils.createElement("div", { classes: "ui-main" });
@@ -53,9 +53,8 @@ export default function renderUI() {
   function refreshNav() {
     if (navFunctionsContainer && navItemsFromJson) {
       renderNavLinks(navFunctionsContainer, navItemsFromJson);
-      console.log("Nav refreshed")
     } else {
-      console.error("Can't refresh nav")
+      console.error("Can't refresh nav");
     }
   }
 
@@ -79,10 +78,10 @@ export default function renderUI() {
   const addTask = domUtils.createElement("div", {
     classes: "nav-add-btn",
     children: [
-      domUtils.createImage(addIcon, {
+      domUtils.createImage(addIcon, "Add task icon", {
         classes: "nav-add-icon",
-        height: "50px",
-        width: "50px"
+        height: "30px",
+        width: "30px",
       }),
       domUtils.createElement("span", {
         classes: "nav-add-text",
@@ -111,19 +110,16 @@ export default function renderUI() {
   if (navItemsFromJson) {
     const tasksItem = navItemsFromJson.find((item) => item.id === "nav-tasks");
 
-    if (
-      tasksItem &&
-      tasksItem.subCategories &&
-      tasksItem.subCategories.length > 0
-    ) {
+    if (tasksItem && tasksItem.projects && tasksItem.projects.length > 0) {
       const subTasksTitle = domUtils.createElement("h2", {
         classes: "project-subtitle",
-        textContent: `Sub-tasks for: ${tasksItem.text}`,
+        textContent: `Projects under: ${tasksItem.text}`,
       });
       projectDisplayContainer.appendChild(subTasksTitle);
+
       renderProjectCards(
         projectDisplayContainer,
-        tasksItem.subCategories,
+        tasksItem.projects,
         navItemsFromJson,
         refreshNav
       );
@@ -135,12 +131,12 @@ export default function renderUI() {
       projectDisplayContainer.appendChild(noSubTasksTitle);
 
       const messageElement = domUtils.createElement("p", {
-        textContent: "There are no tasks at the moment. Add new!",
+        textContent: "There are no projects at the moment. Add new!",
         classes: "no-tasks-message",
       });
       projectDisplayContainer.appendChild(messageElement);
       console.warn(
-        "Could not find 'Tasks' item or its sub-categories in navigation.json"
+        "Could not find 'projects' array in navigation.json or it is empty."
       );
     }
   } else {
