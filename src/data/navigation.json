@@ -14,13 +14,6 @@
             "dueDate": "2025-06-15",
             "Priority": "5",
             "isCompleted": false
-          },
-          {
-            "text": "Finish to-do",
-            "description": "Do this and that to finish the task",
-            "dueDate": "2025-06-15",
-            "Priority": "4",
-            "isCompleted": false
           }
         ]
       },
