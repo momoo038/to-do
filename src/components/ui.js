@@ -104,12 +104,34 @@ export default function renderUI() {
       }),
     ],
   });
-  sideNav.appendChild(addTask);
+  mainContainer.appendChild(addTask);
   
   projectDisplayContainer = domUtils.createElement("div", {
     classes: "projects-main",
   });
   mainContainer.appendChild(projectDisplayContainer);
+
+  const sidenavToggleBtn = domUtils.createElement("div", {
+    classes: "sidenav-toggle-btn",
+    children: [
+        domUtils.createElement("span"),
+        domUtils.createElement("span"),
+        domUtils.createElement("span"),
+    ]
+  });
+  document.body.appendChild(sidenavToggleBtn);
+
+  sidenavToggleBtn.addEventListener('click', () => {
+    sideNav.classList.toggle('expanded-mobile');
+    sidenavToggleBtn.classList.toggle('is-active');
+  });
+
+    projectDisplayContainer.addEventListener('click', () => {
+    if (sideNav.classList.contains('expanded-mobile')) {
+      sideNav.classList.remove('expanded-mobile');
+      sidenavToggleBtn.classList.remove('is-active');
+    }
+  });
 
   refreshAll();
 

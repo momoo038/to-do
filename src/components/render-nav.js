@@ -1,5 +1,6 @@
 import { domUtils } from "../utils/domUtils.js";
 import { saveDataToLocalStorage } from "../utils/localStorageUtils.js";
+import tasksIcon from '../images/tasks.svg'; 
 
 export default function renderNavLinks(nav, items, onDataUpdateCallback) {
   if (!nav) return;
@@ -7,14 +8,13 @@ export default function renderNavLinks(nav, items, onDataUpdateCallback) {
 
   items.forEach((itemData) => {
     const linkChildren = [];
-    if (itemData.icon) {
-      const iconImageElement = domUtils.createImage(itemData.icon, "", {
+    if (itemData.id === 'nav-tasks') {
+      const iconImageElement = domUtils.createImage(tasksIcon, "Tasks Icon", {
         classes: "nav-icon",
       });
-      if (iconImageElement) {
-        linkChildren.push(iconImageElement);
-      }
+      linkChildren.push(iconImageElement);
     }
+    
     linkChildren.push(document.createTextNode(itemData.text || ""));
     const link = domUtils.createElement("a", {
       classes: "nav-link",
@@ -39,8 +39,8 @@ export default function renderNavLinks(nav, items, onDataUpdateCallback) {
             event.stopPropagation();
             itemData.projects.splice(projectIndex, 1);
             saveDataToLocalStorage(items);
-            if (typeof onDataUpdateCallback === "function") {
-              onDataUpdateCallback();
+            if (typeof onDataUpdateCallback === 'function') {
+                onDataUpdateCallback();
             }
           });
 
@@ -49,32 +49,27 @@ export default function renderNavLinks(nav, items, onDataUpdateCallback) {
             id: projectData.id,
             children: [
               document.createTextNode(projectData.text),
-              removeProjectIcon,
-            ],
+              removeProjectIcon
+            ]
           });
 
           projectLink.addEventListener("click", (event) => {
-            if (event.target.classList.contains("nav-remove-project-icon"))
-              return;
-
+            if (event.target.classList.contains('nav-remove-project-icon')) return;
             projectData.isCollapsed = !projectData.isCollapsed;
             saveDataToLocalStorage(items);
-            if (typeof onDataUpdateCallback === "function") {
-              onDataUpdateCallback();
+            if (typeof onDataUpdateCallback === 'function') {
+                onDataUpdateCallback();
             }
           });
-
           subNavContainer.appendChild(projectLink);
 
           if (projectData.tasks && projectData.tasks.length > 0) {
             const tasksListContainer = domUtils.createElement("div", {
               classes: "nav-tasks-list",
             });
-
             if (projectData.isCollapsed) {
-              tasksListContainer.classList.add("collapsed");
+              tasksListContainer.classList.add('collapsed');
             }
-
             projectData.tasks.forEach((taskData) => {
               const statusIcon = taskData.isCompleted ? "●" : "○";
               const taskElement = domUtils.createElement("span", {
