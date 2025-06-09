@@ -1,46 +1,50 @@
-function createElement(
-  tag,
-  { classes, textContent, src, href, target, rel, id, children, listeners } = {}
-) {
+function createElement(tag, options = {}) {
   const element = document.createElement(tag);
 
-  if (classes) {
-    if (Array.isArray(classes)) {
-      element.classList.add(...classes);
-    } else {
-      element.classList.add(classes);
-    }
-  }
-
-  if (textContent) element.textContent = textContent;
-  if (src) element.src = src;
-  if (href) element.href = href;
-  if (target) element.target = target;
-  if (rel) element.rel = rel;
-  if (id) element.id = id;
-
-  if (listeners) {
-    for (const eventType in listeners) {
-      if (Object.prototype.hasOwnProperty.call(listeners, eventType)) {
-        const listenerFunction = listeners[eventType];
-        if (typeof listenerFunction === 'function') {
-          element.addEventListener(eventType, listenerFunction);
-        } else {
-          console.warn(`Listener for event "${eventType}" is not a function.`);
+  for (const [key, value] of Object.entries(options)) {
+    switch (key) {
+      case "classes":
+        if (Array.isArray(value)) {
+          element.classList.add(...value.filter(Boolean));
+        } else if (value) {
+          element.classList.add(value);
         }
-      }
-    }
-  }
+        break;
 
-  if (children) {
-    if (Array.isArray(children)) {
-      children.forEach((child) => {
-        if (child) {
-          element.appendChild(child);
+      case "children":
+        if (Array.isArray(value)) {
+          value.forEach((child) => {
+            if (child) {
+              element.appendChild(child);
+            }
+          });
+        } else if (value) {
+          element.appendChild(value);
         }
-      });
-    } else if (children) {
-      element.appendChild(children);
+        break;
+
+      case "listeners":
+        for (const eventType in value) {
+          if (Object.prototype.hasOwnProperty.call(value, eventType)) {
+            const listenerFunction = value[eventType];
+            if (typeof listenerFunction === "function") {
+              element.addEventListener(eventType, listenerFunction);
+            }
+          }
+        }
+        break;
+
+      case "textContent":
+        element.textContent = value;
+        break;
+
+      case "innerHTML":
+        element.innerHTML = value;
+        break;
+
+      default:
+        element.setAttribute(key, value);
+        break;
     }
   }
 
@@ -78,7 +82,6 @@ function createImage(src, alt, { classes, id, width, height } = {}) {
 // const smallAvatar = createImage('avatars/user123.png', 'Avatar for user123', { width: '50', height: '50' });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 export const domUtils = {
   createElement,

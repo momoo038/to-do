@@ -9,9 +9,12 @@ import {
   saveDataToLocalStorage,
 } from "../utils/localStorageUtils.js";
 import addIcon from "../images/add.svg";
+import taskModal from "./modal-box.js";
+import projectModal from "./project-modal.js";
 
 let navItemsFromJson;
 let navFunctionsContainer;
+let projectDisplayContainer;
 
 export default function renderUI() {
   navItemsFromJson = loadDataFromLocalStorage();
@@ -23,12 +26,8 @@ export default function renderUI() {
   }
 
   const content = document.querySelector("#content");
-  if (content) {
-    content.innerHTML = "";
-  } else {
-    console.error("#content not found");
-    return;
-  }
+  content.innerHTML = "";
+  
   const mainContainer = domUtils.createElement("div", { classes: "ui-main" });
   content.appendChild(mainContainer);
 
@@ -50,23 +49,39 @@ export default function renderUI() {
     classes: "nav-functions",
   });
 
-  function refreshNav() {
-    if (navFunctionsContainer && navItemsFromJson) {
-      renderNavLinks(navFunctionsContainer, navItemsFromJson);
-    } else {
-      console.error("Can't refresh nav");
+  function refreshAll() {
+    renderNavLinks(navFunctionsContainer, navItemsFromJson, refreshAll);
+    
+    const tasksLink = navFunctionsContainer.querySelector("#nav-tasks");
+    if (tasksLink && !tasksLink.querySelector('.add-project-icon')) {
+      const addProjectIcon = domUtils.createElement("span", {
+        classes: "add-project-icon",
+        innerHTML: "&#43;"
+      });
+      tasksLink.appendChild(addProjectIcon);
+      
+      addProjectIcon.addEventListener("click", (event) => {
+        event.stopPropagation();
+        handleProjectModal();
+      });
     }
-  }
 
-  if (navItemsFromJson) {
-    renderNavLinks(navFunctionsContainer, navItemsFromJson);
-  } else {
-    console.error(
-      "Navigation items could not be loaded (imported as undefined/null)."
-    );
-    renderNavLinks(navFunctionsContainer, [
-      { text: "Error", href: "#", id: "nav-error" },
-    ]);
+    const tasksItem = navItemsFromJson.find((item) => item.id === "nav-tasks");
+    projectDisplayContainer.innerHTML = "";
+    const projectsTitle = domUtils.createElement("h1", {
+        classes: "project-title",
+        textContent: "Projects",
+    });
+    projectDisplayContainer.appendChild(projectsTitle);
+    
+    if (tasksItem && tasksItem.projects && tasksItem.projects.length > 0) {
+        renderProjectCards(
+            projectDisplayContainer,
+            tasksItem.projects,
+            navItemsFromJson,
+            refreshAll
+        );
+    }
   }
 
   const sideNav = domUtils.createElement("div", {
@@ -90,65 +105,93 @@ export default function renderUI() {
     ],
   });
   sideNav.appendChild(addTask);
-
-  const projectContainer = domUtils.createElement("div", {
+  
+  projectDisplayContainer = domUtils.createElement("div", {
     classes: "projects-main",
-  });
-  mainContainer.appendChild(projectContainer);
-
-  const projectsTitle = domUtils.createElement("h1", {
-    classes: "project-title",
-    textContent: "Projects",
-  });
-  projectContainer.appendChild(projectsTitle);
-
-  const projectDisplayContainer = domUtils.createElement("div", {
-    classes: "page-content-area",
   });
   mainContainer.appendChild(projectDisplayContainer);
 
-  if (navItemsFromJson) {
-    const tasksItem = navItemsFromJson.find((item) => item.id === "nav-tasks");
+  refreshAll();
 
-    if (tasksItem && tasksItem.projects && tasksItem.projects.length > 0) {
-      const subTasksTitle = domUtils.createElement("h2", {
-        classes: "project-subtitle",
-        textContent: `Projects under: ${tasksItem.text}`,
-      });
-      projectDisplayContainer.appendChild(subTasksTitle);
+  addTask.addEventListener("click", () => {
+    handleTaskModal();
+  });
 
-      renderProjectCards(
-        projectDisplayContainer,
-        tasksItem.projects,
-        navItemsFromJson,
-        refreshNav
-      );
-    } else {
-      projectDisplayContainer.innerHTML = "";
-      const noSubTasksTitle = domUtils.createElement("h2", {
-        classes: "no-project-subtitle",
-      });
-      projectDisplayContainer.appendChild(noSubTasksTitle);
+  function handleTaskModal() {
+    const modalElement = taskModal(navItemsFromJson);
+    document.body.appendChild(modalElement);
+    modalElement.style.display = "flex";
 
-      const messageElement = domUtils.createElement("p", {
-        textContent: "There are no projects at the moment. Add new!",
-        classes: "no-tasks-message",
-      });
-      projectDisplayContainer.appendChild(messageElement);
-      console.warn(
-        "Could not find 'projects' array in navigation.json or it is empty."
-      );
-    }
-  } else {
-    projectDisplayContainer.innerHTML = "";
-    const errorTitle = domUtils.createElement("h2", {
-      classes: "project-subtitle",
-      textContent: "Error",
+    const closeBtn = modalElement.querySelector(".modal-close");
+    const submitBtn = modalElement.querySelector("#submit-task-btn");
+
+    closeBtn.addEventListener("click", () => modalElement.remove());
+
+    submitBtn.addEventListener("click", () => {
+      const selectedProjectId = modalElement.querySelector("#task-project").value;
+      const taskName = modalElement.querySelector("#task-name").value;
+      let taskDesc = modalElement.querySelector("#task-description").value;
+      const taskPriority = modalElement.querySelector("#task-priority").value;
+      const taskDueDate = modalElement.querySelector("#task-due-date").value;
+
+      if (!selectedProjectId || !taskName || !taskDueDate) {
+        alert("Please fill out all required fields.");
+        return;
+      }
+      
+      if (taskDesc.trim() === "") taskDesc = "No description provided";
+      
+      const newTask = {
+        id: `task-${Date.now()}`,
+        text: taskName, description: taskDesc, dueDate: taskDueDate,
+        Priority: taskPriority, isCompleted: false
+      };
+
+      const tasksItem = navItemsFromJson.find(item => item.id === 'nav-tasks');
+      const projectToUpdate = tasksItem.projects.find(p => p.id === selectedProjectId);
+
+      if (projectToUpdate) {
+        if (!projectToUpdate.tasks) projectToUpdate.tasks = [];
+        projectToUpdate.tasks.push(newTask);
+      }
+      
+      saveDataToLocalStorage(navItemsFromJson);
+      refreshAll();
+      modalElement.remove();
     });
-    projectDisplayContainer.appendChild(errorTitle);
-    const errorMessage = domUtils.createElement("p", {
-      textContent: "Navigation data not loaded.",
+  }
+  
+  function handleProjectModal() {
+    const modalElement = projectModal();
+    document.body.appendChild(modalElement);
+    modalElement.style.display = "flex";
+
+    const closeBtn = modalElement.querySelector(".modal-close");
+    const submitBtn = modalElement.querySelector("#submit-project-btn");
+    
+    closeBtn.addEventListener("click", () => modalElement.remove());
+    
+    submitBtn.addEventListener("click", () => {
+        const projectName = modalElement.querySelector("#project-name").value;
+        if (!projectName.trim()) {
+            alert("Please enter a project name.");
+            return;
+        }
+
+        const newProject = {
+            id: `project-${Date.now()}`,
+            text: projectName,
+            tasks: []
+        };
+        
+        const tasksItem = navItemsFromJson.find(item => item.id === 'nav-tasks');
+        if (tasksItem) {
+            tasksItem.projects.push(newProject);
+        }
+
+        saveDataToLocalStorage(navItemsFromJson);
+        refreshAll();
+        modalElement.remove();
     });
-    projectDisplayContainer.appendChild(errorMessage);
   }
 }
