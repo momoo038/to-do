@@ -1,6 +1,7 @@
 import { domUtils } from "../utils/domUtils.js";
 import { saveDataToLocalStorage } from "../utils/localStorageUtils.js";
 import { format, parseISO, isValid } from "date-fns";
+import removeIconSVG from "../images/remove.svg";
 
 export default function renderProjectCards(
   container,
@@ -25,13 +26,9 @@ export default function renderProjectCards(
     const card = domUtils.createElement("div", { classes: "project-card" });
     card.dataset.id = itemData.id;
 
-    const removeIcon = domUtils.createImage(
-      "images/remove.svg",
-      "Remove card",
-      {
-        classes: ["trash-can-icon", "remove-card-hidden"],
-      }
-    );
+    const removeIcon = domUtils.createImage(removeIconSVG, "Remove card", {
+      classes: ["trash-can-icon", "remove-card-hidden"],
+    });
 
     const checkProjectCompletion = () => {
       const allTasksCompleted =
@@ -80,21 +77,28 @@ export default function renderProjectCards(
           textContent: taskData.text,
         });
 
+        const editTaskIcon = domUtils.createElement("span", {
+          classes: "task-action-icon",
+          innerHTML: "&#9998;",
+        });
         const removeTaskIcon = domUtils.createElement("span", {
           classes: "task-action-icon",
           innerHTML: "&#128465;",
         });
-        card.addEventListener("mouseover", () => {
-          removeTaskIcon.style.visibility = "show";
-        });
+
         const iconsContainer = domUtils.createElement("div", {
           classes: "task-icons-container",
-          children: [removeTaskIcon],
+          children: [editTaskIcon, removeTaskIcon],
         });
 
         const mainInfoDiv = domUtils.createElement("div", {
           classes: "task-main-info",
           children: [checkbox, taskText, iconsContainer],
+        });
+
+        editTaskIcon.addEventListener("click", (event) => {
+          event.stopPropagation();
+          console.log("Edit task:", taskData.text);
         });
 
         removeTaskIcon.addEventListener("click", (event) => {
